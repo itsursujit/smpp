@@ -170,7 +170,7 @@ class SmppClient(config: SmppClientConfig, receiver: ClientReceive, pduLogger: P
         config.enquireLinkTimer match {
           case f: FiniteDuration =>
             log.debug("Starting EnquireLink loop")
-            context.system.scheduler.schedule(f / 2, f, self, SendPdu(EnquireLink))(context.dispatcher)
+            context.system.scheduler.scheduleAtFixedRate(f / 2, f, self, SendPdu(EnquireLink))(context.dispatcher)
             context.setReceiveTimeout(f * 2)
           case _ =>
         }

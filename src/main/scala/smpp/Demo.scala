@@ -2,28 +2,27 @@ package smpp
 
 
 import java.net.InetSocketAddress
+import java.util.UUID
 
 import akka.actor.{ActorRef, ActorSystem, Terminated}
 import akka.io.{IO, Tcp}
-import akka.stream.ActorMaterializer
 import akka.util.Timeout
 import smpp.actors.SmppClient.SendEnquireLink
 import smpp.actors.SmppServer.Disconnected
 import smpp.actors._
 import smpp.protocol._
-import smpp.protocol.auth.{BindAuthenticator, BindRequest, BindResponse}
+import smpp.protocol.auth.{BindAuthenticator, BindRequest}
 
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContextExecutor, Future}
 import scala.concurrent.duration._
 
 object Demo extends App {
 
-  implicit val actorSystem = ActorSystem("demo")
-  implicit val materializer = ActorMaterializer()
-  implicit val ec = actorSystem.dispatcher
+  implicit val actorSystem: ActorSystem = ActorSystem("demo")
+  implicit val ec: ExecutionContextExecutor = actorSystem.dispatcher
   val manager = IO(Tcp)
 
-  val pduBuilder = new PduBuilder()
+  val pduBuilder = PduBuilder()
 
   implicit val t: Timeout = 5.seconds
 
@@ -33,14 +32,7 @@ object Demo extends App {
       new SmppServerHandler {
 
         override val bindAuthenticator: BindAuthenticator =
-          new BindAuthenticator {
-
-            override def allowBind(
-                                    bindRequest: BindRequest,
-                                    r: InetSocketAddress,
-                                    l: InetSocketAddress): Future[BindResponse] =
-              Future.successful(bindRequest.respondOk(COctetString.ascii("akka-smpp-demo")))
-          }
+          (bindRequest: BindRequest, r: InetSocketAddress, l: InetSocketAddress) => Future.successful(bindRequest.respondOk(COctetString.ascii("smpp-demo")))
 
         // XXX: split out into bound transmit vs bound receive
         override def bound(connection: ActorRef): Receive = {
@@ -49,7 +41,7 @@ object Demo extends App {
           case submit: SubmitSm =>
             connection ! SubmitSmResp(CommandStatus.ESME_ROK,
               submit.sequenceNumber,
-              Some(COctetString.utf8("1234-asdf")))
+              Some(COctetString.utf8(UUID.randomUUID().toString)))
           case SendEnquireLink =>
             connection ! EnquireLink(sequenceNumberGen.next)
           case Terminated(`connection`) | Disconnected =>
@@ -57,7 +49,9 @@ object Demo extends App {
           case x => println("got " + x)
         }
       },
-      printlnPduLogger("server")))
+      printlnPduLogger("server")
+    )
+  )
 
   // Demo Client
 

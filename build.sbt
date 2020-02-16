@@ -13,6 +13,8 @@ libraryDependencies ++= Seq(
   "com.typesafe.akka" %% "akka-actor" % akkaV,
   "com.typesafe.akka" %% "akka-stream" % akkaV,
   "com.typesafe.akka" %% "akka-slf4j" % akkaV,
+  "org.slf4j" % "slf4j-api" % "1.7.30",
+  "ch.qos.logback" % "logback-classic" % "1.2.3",
   "com.cloudhopper" % "ch-commons-charset" % "3.0.2",
   "com.cloudhopper" % "ch-commons-gsm" % "3.0.0",
   "com.typesafe.akka" %% "akka-testkit" % akkaV % "test",
