@@ -20,14 +20,14 @@ object DemoClient extends App {
   implicit val ec: ExecutionContextExecutor = actorSystem.dispatcher
   val manager = IO(Tcp)
 
-  implicit val t: Timeout = 5.seconds
+  implicit val t: Timeout = 50.seconds
 
   val myClient = SmppClient.connect(
     SmppClientConfig(
-      new InetSocketAddress("localhost", 2775),
+      new InetSocketAddress("dev-smsgateway.wholesalebulksms.com", 2775),
       30.seconds,
       None,
-      Some(SmppClient.Bind("MicroD", "MicroD"))
+      Some(SmppClient.Bind("smppsim", "12345"))
     ), { case EnquireLink(sn) => EnquireLinkResp(sn)},
     "client", printlnPduLogger("client")
   )

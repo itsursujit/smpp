@@ -11,6 +11,7 @@ val akkaV = "2.6.3"
 
 libraryDependencies ++= Seq(
   "com.typesafe.akka" %% "akka-actor" % akkaV,
+  "com.typesafe.akka" %% "akka-actor-typed" % akkaV,
   "com.typesafe.akka" %% "akka-stream" % akkaV,
   "com.typesafe.akka" %% "akka-slf4j" % akkaV,
   "org.slf4j" % "slf4j-api" % "1.7.30",
